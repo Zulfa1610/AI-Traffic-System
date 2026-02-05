@@ -111,7 +111,7 @@ def process_video():
     line_y = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT) // 1.5)
 
     while True:
-        socketio.sleep(0.03)
+        socketio.sleep(0.02)
         # Handle video reset safely
         with state_lock:
             if video_needs_reset:
