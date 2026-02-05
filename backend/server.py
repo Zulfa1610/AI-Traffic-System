@@ -13,12 +13,22 @@ from werkzeug.utils import secure_filename
 # -------------------------------------------------
 # App & Socket.IO setup
 # -------------------------------------------------
-app = Flask(__name__)
-CORS(app)
+app = Flask(__name__, static_folder='dist')
+
+# --- STEP 1: Define your allowed websites ---
+# (This list includes your live site AND your local testing site)
+allowed_origins = [
+    "https://ai-traffic-system.netlify.app",
+    "http://localhost:5173" 
+]
+
+# --- STEP 2: Configure CORS (For Uploads/Fetch) ---
+# We use the list here instead of "*"
+CORS(app, resources={r"/*": {"origins": allowed_origins}})
 
 socketio = SocketIO(
     app,
-    cors_allowed_origins="*",
+    cors_allowed_origins=allowed_origins,
     async_mode="threading"   # safest on Windows
 )
 
