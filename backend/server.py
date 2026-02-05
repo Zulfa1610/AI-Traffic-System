@@ -4,8 +4,6 @@ import base64
 from threading import Lock
 from collections import defaultdict
 
-os.environ["ULTRALYTICS_NO_UPDATE"] = "1"
-os.environ["YOLO_CONFIG_DIR"] = "/tmp/Ultralytics"
 
 from flask import Flask, request, jsonify
 from flask_socketio import SocketIO
@@ -16,23 +14,18 @@ from werkzeug.utils import secure_filename
 # -------------------------------------------------
 # App & Socket.IO setup
 # -------------------------------------------------
-app = Flask(__name__, static_folder='dist')
+app = Flask(__name__)
+CORS(app)
+
 
 # --- STEP 1: Define your allowed websites ---
 # (This list includes your live site AND your local testing site)
-allowed_origins = [
-    "https://ai-traffic-system.netlify.app",
-    "http://localhost:5173" 
-]
-
 # --- STEP 2: Configure CORS (For Uploads/Fetch) ---
 # We use the list here instead of "*"
-CORS(app, resources={r"/*": {"origins": allowed_origins}})
-
 socketio = SocketIO(
     app,
-    cors_allowed_origins=allowed_origins,
-    async_mode="eventlet"   # safest on Windows
+    cors_allowed_origins="*",
+    async_mode="threading"   # safest on Windows
 )
 
 # -------------------------------------------------
@@ -42,8 +35,7 @@ UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 MODEL_PATH = "yolov8n.pt"
-# model = YOLO(MODEL_PATH)
-model= None
+model = YOLO(MODEL_PATH)
 
 # COCO class indices → names
 TARGET_CLASSES = {
@@ -111,15 +103,10 @@ def upload_video():
 def process_video():
     global model,video_needs_reset
 
-    if model is None:
-        print(f"[Info] loading yolo model....")
-        model = YOLO(MODEL_PATH)
-
     cap = cv2.VideoCapture(current_video_source)
     line_y = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT) // 1.5)
 
     while True:
-        socketio.sleep(0.03)
         # Handle video reset safely
         with state_lock:
             if video_needs_reset:
@@ -272,9 +259,8 @@ def handle_connect():
 # Main
 # -------------------------------------------------
 if __name__ == "__main__":
-    port=int(os.environ.get("PORT", 10000))
-    print("AI Tracker Running on Port {port}")
-    socketio.run(app, host="0.0.0.0", port=port)
+    print("AI Tracker Running on Port 5050...}")
+    socketio.run(app, host="0.0.0.0", port=5050)
 
 
 
