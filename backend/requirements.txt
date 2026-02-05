@@ -1,0 +1,7 @@
+Flask
+Flask-SocketIO
+Flask-Cors
+opencv-python-headless
+ultralytics
+eventlet
+gunicorn
