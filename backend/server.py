@@ -29,7 +29,7 @@ CORS(app, resources={r"/*": {"origins": allowed_origins}})
 socketio = SocketIO(
     app,
     cors_allowed_origins=allowed_origins,
-    async_mode="threading"   # safest on Windows
+    async_mode="eventlet"   # safest on Windows
 )
 
 # -------------------------------------------------
@@ -66,6 +66,11 @@ state_lock = Lock()
 # Background task control
 video_task_started = False
 task_lock = Lock()
+
+# --- NEW: Simple Route to check if server is alive ---
+@app.route('/')
+def index():
+    return "AI Traffic Backend is Running!", 200
 
 # -------------------------------------------------
 # Upload endpoint
@@ -106,6 +111,7 @@ def process_video():
     line_y = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT) // 1.5)
 
     while True:
+        socketio.sleep(0.03)
         # Handle video reset safely
         with state_lock:
             if video_needs_reset:
@@ -238,7 +244,6 @@ def process_video():
             }
         )
 
-        socketio.sleep(0.03)  # ~30 FPS
 
 # -------------------------------------------------
 # Socket.IO events
