@@ -149,7 +149,7 @@ const TrafficDashboard = () => {
     formData.append('video', selectedFile);
 
     try {
-      const res = await fetch('https://ai-traffic-system.onrender.com', {
+      const res = await fetch('https://ai-traffic-system.onrender.com/upload', {
         method: 'POST',
         body: formData,
       });
