@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Upload, Video, Activity, Car, Truck, Bus, Bike, User, AlertTriangle, CheckCircle, MinusCircle } from 'lucide-react';
 
 /* ---------------- SOCKET ---------------- */
-const socket = io('https://ai-traffic-system.onrender.com/upload', {
+const socket = io('https://ai-traffic-system.onrender.com', {
   reconnectionAttempts: 5,
 });
 /* ---------------- INITIAL STATE ---------------- */
