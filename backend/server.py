@@ -4,6 +4,9 @@ import base64
 from threading import Lock
 from collections import defaultdict
 
+os.environ["ULTRALYTICS_NO_UPDATE"] = "1"
+os.environ["YOLO_CONFIG_DIR"] = "/tmp/Ultralytics"
+
 from flask import Flask, request, jsonify
 from flask_socketio import SocketIO
 from flask_cors import CORS
@@ -39,7 +42,8 @@ UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 MODEL_PATH = "yolov8n.pt"
-model = YOLO(MODEL_PATH)
+# model = YOLO(MODEL_PATH)
+model= None
 
 # COCO class indices → names
 TARGET_CLASSES = {
@@ -105,13 +109,17 @@ def upload_video():
 # Video processing loop (runs ONCE)
 # -------------------------------------------------
 def process_video():
-    global video_needs_reset
+    global model,video_needs_reset
+
+    if model is None:
+        print(f"[Info] loading yolo model....")
+        model = YOLO(MODEL_PATH)
 
     cap = cv2.VideoCapture(current_video_source)
     line_y = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT) // 1.5)
 
     while True:
-        socketio.sleep(0.02)
+        socketio.sleep(0.03)
         # Handle video reset safely
         with state_lock:
             if video_needs_reset:
@@ -264,8 +272,9 @@ def handle_connect():
 # Main
 # -------------------------------------------------
 if __name__ == "__main__":
-    print("AI Tracker Running on Port 5050...")
-    socketio.run(app, host="0.0.0.0", port=5050)
+    port=int(os.environ.get("PORT", 10000))
+    print("AI Tracker Running on Port {port}")
+    socketio.run(app, host="0.0.0.0", port=port)
 
 
 
