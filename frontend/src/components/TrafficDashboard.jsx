@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Upload, Video, Activity, Car, Truck, Bus, Bike, User, AlertTriangle, CheckCircle, MinusCircle } from 'lucide-react';
 
 /* ---------------- SOCKET ---------------- */
-const socket = io('https://ai-traffic-system.onrender.com', {
+const socket = io('http://localhost:5050', {
   reconnectionAttempts: 5,
 });
 /* ---------------- INITIAL STATE ---------------- */
@@ -149,7 +149,7 @@ const TrafficDashboard = () => {
     formData.append('video', selectedFile);
 
     try {
-      const res = await fetch('https://ai-traffic-system.onrender.com/upload', {
+      const res = await fetch('http://localhost:5050/upload', {
         method: 'POST',
         body: formData,
       });
